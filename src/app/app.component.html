@@ -60,6 +60,17 @@
       <button class="shop" type="button" (click)="buySeeds()"><span>🛒</span><b>CỬA HÀNG</b><small>6 hạt · 120G</small></button>
       <div class="fence">╫ ╫ ╫ ╫ ╫ ╫ ╫ ╫ ╫ ╫ ╫ ╫</div>
     </section>
+    <section class="farm-facilities" aria-label="Công trình nông trại">
+      <article><h3>🐄 Chuồng bò cừu</h3><p>{{ state().cows }} bò · {{ state().sheep }} cừu / {{ state().barnLevel * 10 }} chỗ · Máng: {{ state().trough }}</p>
+        <div class="facility-actions"><button (click)="farmAction('cow')">Mua bò · 500G</button><button (click)="farmAction('sheep')">Mua cừu · 400G</button><button (click)="farmAction('barn')" [disabled]="state().barnLevel === 2">Nâng cấp · 800G + 10 gỗ</button><button (click)="farmAction('fodder')">Green Ranch: thức ăn · 100G</button><button (click)="farmAction('trough')">Cho thức ăn vào máng</button><button (click)="farmAction('outside')">{{ state().animalsOutside ? 'Đưa về chuồng' : 'Thả ra ngoài' }}</button></div>
+      </article>
+      <article><h3>🌱 Vườn cỏ</h3><p>Hạt: {{ state().grassSeeds }} · Cỏ: {{ state().grass }} · {{ state().grassGrowth === 3 ? 'Đã chín' : state().grassGrowth ? 'Đang lớn' : 'Đất trống' }}</p>
+        <div class="facility-actions"><button (click)="farmAction('grass-seeds')">Siêu thị: 3 hạt · 60G</button><button (click)="farmAction('plant-grass')">Gieo cỏ</button><button (click)="farmAction('harvest-grass')">Thu hoạch</button></div>
+      </article>
+      <article><h3>🐴 Chuồng ngựa</h3><p>{{ state().year === 1 && state().season < 3 ? 'Ngựa sẽ đến vào mùa đông đầu tiên' : state().horseOutside ? 'Ngựa đang ở ngoài' : 'Ngựa an toàn trong chuồng' }}</p><div class="facility-actions"><button (click)="farmAction('horse')">{{ state().horseOutside ? 'Đưa ngựa về' : 'Thăm ngựa / cho ra ngoài' }}</button></div></article>
+      <article><h3>🐟 Ao cá</h3><p>{{ state().fish }} cá · {{ state().fishFeed }} thức ăn · Bình tưới {{ state().water }}/10</p><div class="facility-actions"><button (click)="farmAction('fish')">Thả cá · 80G</button><button (click)="farmAction('fish-feed')">Siêu thị: thức ăn · 50G</button><button (click)="farmAction('feed-fish')">Cho cá ăn</button><button (click)="farmAction('water')">Lấy nước</button></div></article>
+      <article><h3>🪵 Nhà chứa gỗ</h3><p>Trong kho: {{ state().storedWood }} · Mang theo: {{ state().wood }} · Hàng rào: {{ state().fence }}</p><div class="facility-actions"><button (click)="farmAction('store-wood')">Cất gỗ · X</button><button (click)="farmAction('take-wood')">Lấy gỗ</button><button (click)="farmAction('fence')">Xây hàng rào · 2 gỗ</button></div></article>
+    </section>
   } @else {
     <section class="house-world" [class.house-expanded]="state().houseLevel >= 2" [class.house-family]="state().houseLevel === 3" aria-label="Bên trong căn nhà">
       <div class="wallpaper"></div><div class="floorboards"></div><div class="ceiling-beam"></div>

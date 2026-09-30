@@ -19,6 +19,21 @@ interface Plot {
 }
 
 interface GameState {
+  cows: number;
+  sheep: number;
+  barnLevel: 1 | 2;
+  fodder: number;
+  trough: number;
+  grassSeeds: number;
+  grass: number;
+  grassGrowth: number;
+  fish: number;
+  fishFeed: number;
+  water: number;
+  storedWood: number;
+  fence: number;
+  animalsOutside: boolean;
+  horseOutside: boolean;
   farmerName: string;
   farmName: string;
   day: number;
@@ -153,6 +168,8 @@ const RECIPES: Recipe[] = [
 ];
 
 const FRESH_GAME: GameState = {
+  cows: 0, sheep: 0, barnLevel: 1, fodder: 0, trough: 0, grassSeeds: 0, grass: 0, grassGrowth: 0,
+  fish: 0, fishFeed: 0, water: 10, storedWood: 0, fence: 0, animalsOutside: false, horseOutside: false,
   farmerName: 'Pete', farmName: 'Mộc Lan', day: 3, season: 0, year: 1,
   time: 390, weather: 'Nắng', tomorrowWeather: 'Mưa', money: 500, stamina: 100,
   wood: 6, logAvailable: true, seeds: 6, turnips: 0, affection: 0, houseLevel: 1,
@@ -189,6 +206,15 @@ function normalizeGameState(value: unknown): GameState {
   };
 
   return {
+    cows: integerOr(source.cows, 0, 0, 20), sheep: integerOr(source.sheep, 0, 0, 20),
+    barnLevel: source.barnLevel === 2 ? 2 : 1,
+    fodder: integerOr(source.fodder, 0, 0), trough: integerOr(source.trough, 0, 0),
+    grassSeeds: integerOr(source.grassSeeds, 0, 0), grass: integerOr(source.grass, 0, 0),
+    grassGrowth: integerOr(source.grassGrowth, 0, 0, 3),
+    fish: integerOr(source.fish, 0, 0), fishFeed: integerOr(source.fishFeed, 0, 0),
+    water: integerOr(source.water, 10, 0, 10), storedWood: integerOr(source.storedWood, 0, 0),
+    fence: integerOr(source.fence, 0, 0), animalsOutside: source.animalsOutside === true,
+    horseOutside: source.horseOutside === true,
     farmerName: typeof source.farmerName === 'string' ? source.farmerName : FRESH_GAME.farmerName,
     farmName: typeof source.farmName === 'string' ? source.farmName : FRESH_GAME.farmName,
     day: integerOr(source.day, FRESH_GAME.day, 1, 30),
@@ -345,8 +371,11 @@ export class AppComponent {
       plot.state = 'tilled'; cost = 4; message = 'Bạn đã cuốc một ô đất mới.';
     } else if (tool === 'seeds' && plot.state === 'tilled' && game.seeds > 0) {
       plot.state = 'seeded'; game.seeds--; cost = 2; message = 'Hạt củ cải đã được gieo xuống.';
-    } else if (tool === 'can' && ['seeded', 'growing'].includes(plot.state) && !plot.watered) {
+    } else if (tool === 'can' && ['seeded', 'growing'].includes(plot.state) && !plot.watered && game.water > 0) {
+      game.water--;
       plot.watered = true; cost = 2; message = 'Mảnh đất đã được tưới mát.';
+    } else if (tool === 'can' && game.water === 0) {
+      message = 'Bình tưới đã cạn. Hãy lấy nước ở ao cá.';
     } else if (tool === 'hand' && plot.state === 'ready') {
       plot.state = 'tilled'; plot.growth = 0; plot.watered = false; game.turnips++; message = 'Thu hoạch củ cải! Hãy bán nó để kiếm tiền.';
     } else if (tool === 'seeds' && game.seeds === 0) {
@@ -377,6 +406,63 @@ export class AppComponent {
     if (game.money < 120) { this.notice.set('Bạn không đủ tiền mua hạt giống.'); return; }
     game.money -= 120; game.seeds += 6; this.state.set(game);
     this.notice.set('Đã mua một túi 6 hạt củ cải với giá 120G.');
+  }
+
+  protected farmAction(action: string): void {
+    const game = structuredClone(this.state());
+    const pay = (amount: number): boolean => {
+      if (game.money < amount) { this.notice.set(`Bạn cần ${amount}G.`); return false; }
+      game.money -= amount; return true;
+    };
+    let message = '';
+    switch (action) {
+      case 'cow': case 'sheep':
+        if (game.cows + game.sheep >= game.barnLevel * 10) { message = 'Chuồng đã đầy. Hãy nâng cấp để nuôi thêm.'; break; }
+        if (!pay(action === 'cow' ? 500 : 400)) return;
+        if (action === 'cow') game.cows++; else game.sheep++;
+        message = `Đã đưa ${action === 'cow' ? 'bò' : 'cừu'} vào chuồng.`; break;
+      case 'barn':
+        if (game.barnLevel === 2) { message = 'Chuồng đã đạt sức chứa 20 con.'; break; }
+        if (game.storedWood < 10 || !pay(800)) { message = 'Nâng cấp cần 800G và 10 gỗ trong kho.'; break; }
+        game.storedWood -= 10; game.barnLevel = 2; message = 'Chuồng đã mở rộng, sức chứa 20 con.'; break;
+      case 'fodder': if (!pay(100)) return; game.fodder += 10; message = 'Đã mua 10 phần thức ăn tại Green Ranch.'; break;
+      case 'trough':
+        if (!game.fodder && !game.grass) { message = 'Không có cỏ hoặc thức ăn để bỏ vào máng.'; break; }
+        if (game.grass) game.grass--; else game.fodder--;
+        game.trough++; message = 'Đã thêm một phần thức ăn vào máng.'; break;
+      case 'grass-seeds': if (!pay(60)) return; game.grassSeeds += 3; message = 'Đã mua 3 hạt giống cỏ ở siêu thị.'; break;
+      case 'plant-grass':
+        if (!game.grassSeeds || game.grassGrowth) { message = 'Cần hạt giống và luống cỏ trống.'; break; }
+        game.grassSeeds--; game.grassGrowth = 1; message = 'Đã gieo cỏ. Cỏ sẽ lớn sau hai đêm.'; break;
+      case 'harvest-grass':
+        if (game.grassGrowth < 3) { message = 'Cỏ chưa sẵn sàng thu hoạch.'; break; }
+        game.grass += 5; game.grassGrowth = 0; message = 'Đã thu hoạch 5 phần cỏ làm thức ăn.'; break;
+      case 'fish': if (!pay(80)) return; game.fish++; message = 'Đã thả một con cá vào ao.'; break;
+      case 'fish-feed': if (!pay(50)) return; game.fishFeed += 10; message = 'Đã mua 10 phần thức ăn cho cá ở siêu thị.'; break;
+      case 'feed-fish':
+        if (!game.fish || !game.fishFeed) { message = 'Cần có cá và thức ăn cho cá.'; break; }
+        game.fishFeed--; message = 'Bạn đã cho cá ăn.'; break;
+      case 'water': game.water = 10; message = 'Đã lấy đầy nước cho bình tưới từ ao.'; break;
+      case 'store-wood':
+        if (!game.wood) { message = 'Bạn không có gỗ để cất.'; break; }
+        game.wood--; game.storedWood++; message = 'Đã cất 1 gỗ vào nhà chứa.'; break;
+      case 'take-wood':
+        if (!game.storedWood) { message = 'Nhà chứa không còn gỗ.'; break; }
+        game.storedWood--; game.wood++; message = 'Đã lấy 1 gỗ từ nhà chứa.'; break;
+      case 'fence':
+        if (game.storedWood < 2) { message = 'Cần 2 gỗ trong nhà chứa để xây hàng rào.'; break; }
+        game.storedWood -= 2; game.fence++; message = 'Đã xây một đoạn hàng rào.'; break;
+      case 'outside':
+        if (!game.cows && !game.sheep) { message = 'Chuồng chưa có bò hoặc cừu.'; break; }
+        if (!game.animalsOutside && !game.fence) { message = 'Hãy xây hàng rào trước để tránh chó hoang.'; break; }
+        game.animalsOutside = !game.animalsOutside; message = game.animalsOutside ? 'Đã thả vật nuôi trong khu có hàng rào.' : 'Đã đưa vật nuôi về chuồng.'; break;
+      case 'horse':
+        if (game.year === 1 && game.season < 3) { message = 'Ngựa sẽ đến vào mùa đông đầu tiên.'; break; }
+        if (game.weather === 'Mưa') { game.horseOutside = false; message = 'Trời mưa, ngựa ở trong chuồng.'; break; }
+        game.horseOutside = !game.horseOutside; message = game.horseOutside ? 'Ngựa đang dạo chơi ngoài trời.' : 'Ngựa đã về chuồng.'; break;
+      default: return;
+    }
+    this.state.set(game); this.notice.set(message);
   }
 
   protected sellProduce(): void {
@@ -443,11 +529,16 @@ export class AppComponent {
       plot.watered = false;
     }
     game.day++;
+    if (game.grassGrowth > 0) game.grassGrowth = Math.min(3, game.grassGrowth + 1);
+    const livestock = game.cows + game.sheep;
+    game.trough = Math.max(0, game.trough - livestock);
+    game.fishFeed = Math.max(0, game.fishFeed - game.fish);
     if (game.day > 30) { game.day = 1; game.season++; }
     if (game.season > 3) { game.season = 0; game.year++; }
     game.time = 360; game.stamina = 100;
     game.logAvailable = true;
     game.weather = game.tomorrowWeather;
+    if (game.weather === 'Mưa') { game.horseOutside = false; game.animalsOutside = false; }
     game.tomorrowWeather = Math.random() > 0.72 ? 'Mưa' : 'Nắng';
     this.state.set(game);
     this.notice.set(`Bạn thức dậy vào ${this.weekday()}, ngày ${game.day}. Hôm nay trời ${game.weather.toLowerCase()}.`);
@@ -625,6 +716,7 @@ export class AppComponent {
     }
     const target = event.target as HTMLElement | null;
     if (target?.matches('input, textarea, select') || this.activePanel() || this.showGuide() || this.showMenu()) return;
+    if (key === 'x' && this.scene() === 'farm') { this.farmAction('store-wood'); event.preventDefault(); return; }
     const bindings = this.selectedControl().bindings;
     if (key === bindings.previous.value) this.cycleTool(-1);
     else if (key === bindings.next.value) this.cycleTool(1);

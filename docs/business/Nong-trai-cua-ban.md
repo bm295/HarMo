@@ -8,8 +8,9 @@ Người chơi sở hữu một mảnh đất ngay từ đầu game. Khi bắt �
 
 - 1 căn nhà nhỏ, là nơi người chơi sinh sống.
 - 1 chuồng gà.
-- 1 chuồng bò.
+- 1 chuồng bò và cừu.
 - 1 chuồng nhỏ dành cho con ngựa của người chơi.
+- 1 ao cá.
 - 1 nơi chứa gỗ.
 - 1 khoảng vườn rộng để trồng trọt.
 
@@ -64,11 +65,31 @@ Trong căn nhà ban đầu, người chơi có sẵn các vật dụng sau:
 - Nếu trại gà đóng cửa mà người chơi hết thức ăn, có thể dùng ngô (corn) để làm thức ăn thay thế.
 - Tỷ lệ quy đổi: 1 quả ngô tương đương 10 phần thức ăn cho gà.
 
-## 4. Ghi chú
+## 4. Chuồng bò và cừu
 
-Tài liệu này chỉ mô tả phần khu đất, nhà và chuồng gà từ nội dung được cung cấp. Nếu cần, có thể bổ sung thêm các khu vực khác như chuồng bò, chuồng ngựa, khu trồng trọt, hoặc các nâng cấp liên quan trong các tài liệu nghiệp vụ riêng.
+- Chuồng có thể nuôi tổng cộng tối đa 10 con bò và cừu. Sau khi nâng cấp, sức chứa tăng lên 20 con.
+- Trong chuồng có các máng để đựng thức ăn cho bò và cừu.
+- Người chơi có thể mua thức ăn cho bò tại trại bò Green Ranch và cho thức ăn vào máng.
+- Người chơi cũng có thể mua hạt giống cỏ ở siêu thị, trồng và thu hoạch cỏ để làm thức ăn cho bò và cừu.
 
-## 5. Yêu cầu sẵn sàng cho TDD
+## 5. Chuồng ngựa
+
+- Vào mùa đông đầu tiên, người chơi nhận được một con ngựa.
+- Chuồng là nơi trú cho ngựa, đặc biệt khi trời mưa.
+
+## 6. Ao cá
+
+- Người chơi có thể nuôi cá trong ao.
+- Thức ăn cho cá được bán tại siêu thị.
+- Người chơi có thể lấy nước từ ao để đổ vào bình tưới cây.
+
+## 7. Nhà chứa gỗ và hàng rào
+
+- Nhà chứa gỗ dùng để cất số gỗ người chơi thu được. Người chơi bấm phím `X` để cất gỗ vào đây.
+- Gỗ trong nhà chứa có thể dùng để xây hàng rào.
+- Khi thả bò, cừu hoặc gà ra ngoài, hàng rào giúp bảo vệ chúng khỏi chó hoang.
+
+## 8. Yêu cầu sẵn sàng cho TDD
 
 ### RQ-FARM-001: Mở khóa khu sinh hoạt gia đình khi nhà đạt cấp 3
 
