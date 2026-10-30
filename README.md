@@ -40,3 +40,12 @@ Mở **cuốn nhật ký** trong nhà để lưu nhanh vào trình duyệt. Ngo�
 - **Tải file save** đọc lại file đã lưu, không cần máy chủ hay tài khoản.
 
 Toàn bộ tiến trình nằm trong file JSON; trình duyệt không tự động tải dữ liệu lên mạng.
+
+
+## Ellie · AI Lab
+
+Bấm **Trò chuyện Ellie · AI Lab** ở nông trại để đếm token, xem context, so sánh tìm kiếm embeddings với từ khóa và hỏi Ellie dựa trên trạng thái hiện tại. Phần AI chỉ tư vấn, không thay đổi luật hay tiến trình game.
+
+Cài thêm `npm ci --prefix server`, chép `server/.env.example` thành `server/.env`, chạy `npm run server` trong terminal riêng rồi `npm start`. Điền `OPENAI_API_KEY` trên server nếu muốn gọi embeddings và model thật (có phí). Tokenizer và xem context dùng được không cần key. Yêu cầu Node.js >=20.12.
+
+Xem [hướng dẫn và bài thực hành AI](docs/ai-fundamentals.md). Kiểm tra backend bằng `npm run test:ai`.

@@ -43,6 +43,7 @@
         <span class="house-sign">MỘC LAN</span><span class="enter-house">VÀO NHÀ</span>
       </button>
       <div class="tree tree-a">🌳</div><div class="tree tree-b">🌳</div><div class="tree tree-c">🌲</div>
+      <button type="button" class="ai-lab-entry" (click)="showAiLab.set(true)">🌿 Trò chuyện Ellie · AI Lab</button>
       <button class="ellie character" type="button" (click)="talkToEllie()"><span>♥</span>👩🏻‍🌾<small>Ellie</small></button>
       <div class="farmer character">🧑🏻‍🌾<small>{{ state().farmerName }}</small></div>
       <button class="log-pile" type="button" [class.harvested]="!state().logAvailable" (click)="chopWood()" [attr.aria-label]="state().logAvailable ? 'Khúc gỗ, dùng rìu để chặt' : 'Gốc cây, chờ tới ngày mai'">{{ state().logAvailable ? '🪵' : '🪚' }}<small>{{ state().logAvailable ? 'Gỗ +2' : 'Ngày mai' }}</small></button>
@@ -312,3 +313,8 @@
     </div>
   }
 </main>
+
+
+@if (showAiLab()) {
+  <app-npc-chat [snapshot]="aiSnapshot()" (closed)="showAiLab.set(false)" />
+}

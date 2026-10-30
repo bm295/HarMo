@@ -1,3 +1,4 @@
+import { NpcChatComponent } from './features/npc-chat/npc-chat.component';
 import { CommonModule } from '@angular/common';
 import { Component, computed, HostListener, signal } from '@angular/core';
 
@@ -263,7 +264,7 @@ function validSavedAt(value: unknown): string | null {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NpcChatComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -289,6 +290,11 @@ export class AppComponent {
   protected readonly tvChannel = signal<TvChannel>('weather');
   protected readonly notice = signal('Một ngày mới bắt đầu. Hãy chăm sóc nông trại của bạn!');
   protected readonly showGuide = signal(false);
+  protected readonly showAiLab = signal(false);
+  protected readonly aiSnapshot = computed(() => {
+    const g = this.state();
+    return { day:g.day, season:g.season, year:g.year, money:g.money, stamina:g.stamina, seeds:g.seeds, turnips:g.turnips, wood:g.wood, water:g.water, houseLevel:g.houseLevel, weather:g.weather, tomorrowWeather:g.tomorrowWeather, unwateredPlots:g.plots.filter(p => ['seeded','growing'].includes(p.state) && !p.watered).length };
+  });
   protected readonly showMenu = signal(false);
   protected readonly lastJournalSave = signal<string | null>(null);
   protected readonly journalHasSave = signal(false);
@@ -703,6 +709,7 @@ export class AppComponent {
 
   @HostListener('window:keydown', ['$event'])
   protected handleKeyboard(event: KeyboardEvent): void {
+    if (this.showAiLab()) return;
     const key = event.key.toLowerCase();
     if (key === 'escape') {
       if (this.activePanel()) this.closePanel();
