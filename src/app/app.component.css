@@ -344,3 +344,6 @@ button,label { font:inherit; }
   .panel-actions,.journal-stats { grid-template-columns:1fr; }
   .pantry-line { display:grid; gap:5px; }
 }
+
+
+.ai-lab-entry { position:absolute; top:12px; right:12px; z-index:10; padding:10px 14px; border-radius:12px; background:#fff8df; color:#244c32; border:2px solid #6a8b54; cursor:pointer; max-width:70%; }

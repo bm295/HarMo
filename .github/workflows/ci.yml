@@ -25,3 +25,13 @@ jobs:
 
       - name: Run tests with coverage
         run: npm test -- --watch=false --code-coverage --browsers=ChromeHeadless
+
+
+      - name: Install AI server dependencies
+        run: npm ci --prefix server
+
+      - name: Test AI API
+        run: npm run test:ai
+
+      - name: Build application
+        run: npm run build
